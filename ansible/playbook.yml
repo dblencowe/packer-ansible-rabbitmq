@@ -1,0 +1,28 @@
+- hosts: all
+  become: true
+  gather_facts: False
+  pre_tasks:
+    - raw: test -e /usr/bin/python || (apt-get install -y python-minimal)
+    - setup:
+  roles:
+    - { role: geerlingguy.rabbitmq }
+    - { role: nginxinc.nginx }
+    - { role: configure }
+  vars:
+    rabbitmq_version: "3.7.10"
+    nginx_http_template_enable: true
+    nginx_http_template:
+      default:
+        template_file: http/default.conf.j2
+        conf_file_name: default.conf
+        conf_file_location: /etc/nginx/conf.d/
+        port: 80
+        server_name: localhost
+        error_page: /usr/share/nginx/html
+        autoindex: false
+        load_balancer:
+          locations:
+            default:
+              location: /
+              proxy_pass: 127.0.0.1:15672
+          health_check_plus: false

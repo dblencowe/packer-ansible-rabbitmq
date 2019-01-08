@@ -1,0 +1,3 @@
+---
+- name: enable rabbitmq management plugin
+  command: rabbitmq-plugins enable rabbitmq_management
